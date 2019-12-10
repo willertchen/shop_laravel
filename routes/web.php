@@ -19,7 +19,7 @@ Route::get('/', function () {
 Route::group(['prefix' => 'user'], function () {
 
 //    使用者認證
-    Route::group(['prefix' => 'auth'], function () {
+    Route::group(['prefix' => 'auth'], function(){
 //        使用者註冊
         Route::get('/sign-up', 'UserAuthController@signUpPage');
 
@@ -34,5 +34,32 @@ Route::group(['prefix' => 'user'], function () {
 
 //        使用者登出
         Route::get('/sign-out', 'UserAuthController@signOut');
+    });
+});
+
+// 商品
+Route::group(['prefix' => 'merchandise'], function(){
+//    商品清單檢視
+    Route::get('/','MerchandiseController@merchandiseListPage');
+
+//    新增商品資料
+    Route::get('/create','MerchandiseController@merchandiseCreateProcess');
+
+//    商品管理清單檢視
+    Route::get('/manage','MerchandiseController@merchandiseManageListPage');
+
+//    指定商品
+    Route::group(['prefix' => '{merchandise_id}'], function(){
+//        商品單品檢視
+        Route::get('/','MerchandiseController@merchandiseItemPage');
+
+//        商品單品編輯
+        Route::get('/edit','MerchandiseController@merchandiseItemEditPage');
+
+//        商品單品資料修改
+        Route::put('/','MerchandiseController@merchandiseItemUpdatePage');
+
+//        購買商品
+        Route::post('/buy','MerchandiseController@merchandiseItemBuyPage');
     });
 });

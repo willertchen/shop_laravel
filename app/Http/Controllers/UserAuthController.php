@@ -14,7 +14,8 @@ class UserAuthController extends Controller
 {
 
     // 註冊頁
-    public function signUpPage(){
+    public function signUpPage()
+    {
         $binding = [
             'title' => '註冊',
         ];
@@ -22,7 +23,8 @@ class UserAuthController extends Controller
     }
 
     // 處理註冊資料
-    public function signUpProcess(){
+    public function signUpProcess()
+    {
         $input = request()->all();
 
         // 驗證規則
@@ -70,18 +72,23 @@ class UserAuthController extends Controller
             'nickname' => $input['nickname'],
         ];
 
-        Mail::send('email.signUpEmailNotification', $mail_binding, function ($mail) use ($input){
-            $mail->to($input['email']);
-            $mail->from('eml0777ys@gmail.com');
-            $mail->subject('恭禧註冊 Shop Laravel 成功');
-        });
+        Mail::send(
+            'email.signUpEmailNotification',
+            $mail_binding,
+            function ($mail) use ($input) {
+                $mail->to($input['email']);
+                $mail->from('eml0777ys@gmail.com');
+                $mail->subject('恭禧註冊 Shop Laravel 成功');
+            }
+        );
 
 //        重新導向到登入頁面
         return redirect('/user/auth/sign-in');
     }
 
 //    登入
-    public function signInPage(){
+    public function signInPage()
+    {
         $binding = [
             'title' => '登入',
         ];
@@ -90,7 +97,8 @@ class UserAuthController extends Controller
     }
 
 //    處理登入資料
-    public function signInProcess(){
+    public function signInProcess()
+    {
 //        接收輸入資料
         $input = request()->all();
 
@@ -152,7 +160,8 @@ class UserAuthController extends Controller
     }
 
 //    處理登出資料
-    public function signOut(){
+    public function signOut()
+    {
 //        清除 Session
         session()->forget('user_id');
 
