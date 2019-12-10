@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use Mail;
 use Validator;  // 驗證器
 use Hash;       // 雜湊
+use DB;
 use App\Shop\Entity\User;  // 使用者 Eloquent ORM Model
 
 class UserAuthController extends Controller
@@ -77,5 +78,85 @@ class UserAuthController extends Controller
 
 //        重新導向到登入頁面
         return redirect('/user/auth/sign-in');
+    }
+
+//    登入
+    public function signInPage(){
+        $binding = [
+            'title' => '登入',
+        ];
+
+        return view('auth.signIn', $binding);
+    }
+
+//    處理登入資料
+    public function signInProcess(){
+//        接收輸入資料
+        $input = request()->all();
+
+//        驗證規則
+        $rules = [
+//            Email
+            'email' => [
+                'required',
+                'max:150',
+                'email',
+            ],
+//            密碼
+            'password' => [
+                'required',
+                'min:6',
+            ],
+        ];
+
+//        驗證資料
+        $validator = Validator::make($input, $rules);
+
+        if ($validator->fails()) {
+//            資料驗證錯誤
+            return redirect('/user/auth/sign-in')
+                ->withErrors($validator)
+                ->withInput();
+        }
+
+//        啟用記錄 SQL 語法
+//        DB::enableQueryLog();
+
+//        撈取使用者資料
+        $User = User::where('email', $input['email'])->firstOrFail();
+
+//        列印出目前資料庫目前所有執行的 SQL 語法
+//        var_dump(DB::getQueryLog());
+//        exit;
+
+//        檢查密碼是否正確
+        $is_password_correct = Hash::check($input['password'], $User->password);
+
+        if (!$is_password_correct) {
+            $error_message = [
+                'msg' => [
+                    '密碼驗證錯誤',
+                ],
+            ];
+
+            return redirect('/user/auth/sign-in')
+                ->withErrors($error_message)
+                ->withInput();
+        }
+
+//        session 記錄會員編號
+        session()->put('user_id', $User->id);
+
+//        重新導向到原先使用者造訪的頁面，沒有嘗試造訪頁，則重新導回首頁
+        return redirect()->intended('/');
+    }
+
+//    處理登出資料
+    public function signOut(){
+//        清除 Session
+        session()->forget('user_id');
+
+//        重碟導向首頁
+        return redirect('/');
     }
 }
