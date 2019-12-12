@@ -62,6 +62,9 @@ Route::group(['prefix' => 'merchandise'], function(){
         Route::get('/','MerchandiseController@merchandiseItemPage');
 
 //        購買商品
-        Route::post('/buy','MerchandiseController@merchandiseItemBuyPage')->middleware(['user.auth']);
+        Route::post('/buy','MerchandiseController@merchandiseItemBuyProcess')->middleware(['user.auth']);
     });
 });
+
+// 交易
+Route::get('transaction', 'TransactionController@transactionListPage')->middleware(['user.auth']);
