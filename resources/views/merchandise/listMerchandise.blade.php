@@ -38,7 +38,7 @@
         </table>
 
         {{-- 分頁頁數按鈕 --}}
-        {{ $MerchandisePaginate->link() }}
+{{--        {{ $MerchandisePaginate->link() }}--}}
     </div>
 @endsection
 
