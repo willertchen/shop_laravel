@@ -9,6 +9,7 @@ use Validator;  // 驗證器
 use Hash;       // 雜湊
 use DB;
 use App\Shop\Entity\User;  // 使用者 Eloquent ORM Model
+use Socialite;
 
 class UserAuthController extends Controller
 {
@@ -167,5 +168,15 @@ class UserAuthController extends Controller
 
 //        重碟導向首頁
         return redirect('/');
+    }
+
+    public function facebookSignInProcess()
+    {
+        $redirect_url = env('FB_REDIRECT');
+
+        return Socialite::driver('facebook')
+            ->scopes(['user_friends'])
+            ->redirectUrl($redirect_url)
+            ->redirect();
     }
 }
