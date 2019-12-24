@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Jobs\SendSignUpMailJob;
 use Mail;
 use Validator;  // 驗證器
 use Hash;       // 雜湊
@@ -73,15 +74,8 @@ class UserAuthController extends Controller
             'nickname' => $input['nickname'],
         ];
 
-        Mail::send(
-            'email.signUpEmailNotification',
-            $mail_binding,
-            function ($mail) use ($input) {
-                $mail->to($input['email']);
-                $mail->from('eml0777ys@gmail.com');
-                $mail->subject('恭禧註冊 Shop Laravel 成功');
-            }
-        );
+//        派發 "註冊成功信" 工作
+        SendSignUpMailJob::dispatch($mail_binding);
 
 //        重新導向到登入頁面
         return redirect('/user/auth/sign-in');
@@ -244,18 +238,15 @@ class UserAuthController extends Controller
                 'nickname' => $input['nickname']
             ];
 
-            Mail::send('email.signUpEmailNotification', $mail_binding, function ($mail) use ($input){
-               $mail->to($input['email']);
-               $mail->from('eml0777us@gmail.com');
-               $mail->subject('恭喜註冊 Shop Laravel 成功');
-            });
+//            派發 "註冊成功信" 工作
+            SendSignUpMailJob::dispatch($mail_binding);
 
-//            登入會員
-//            session 記錄會員編號
-            session()->put('user_id', $User->id);
-
-//            重新導向到原先使用者造訪頁面，如果沒有造訪頁則重新導向回首頁
-            return redirect()->intended('/');
         }
+//        登入會員
+//        session 記錄會員編號
+        session()->put('user_id', $User->id);
+
+//        重新導向到原先使用者造訪頁面，如果沒有造訪頁則重新導向回首頁
+        return redirect()->intended('/');
     }
 }
