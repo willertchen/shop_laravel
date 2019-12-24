@@ -170,6 +170,7 @@ class UserAuthController extends Controller
         return redirect('/');
     }
 
+//    facebook 登入
     public function facebookSignInProcess()
     {
         $redirect_url = env('FB_REDIRECT');
@@ -178,5 +179,83 @@ class UserAuthController extends Controller
             ->scopes(['user_friends'])
             ->redirectUrl($redirect_url)
             ->redirect();
+    }
+
+//    Facebook 登入重新導向授權資料處理
+    public function facebookSignInCallbackProcess()
+    {
+        if (request()->error == 'access_denied') {
+            throw new Exception('授權失敗，存取錯誤');
+        }
+//        依照網域產出重新導向連結 (來驗證是否為發出時同一 callback)
+        $redirect_url = env('FB_REDIRECT');
+//        取得第三方使用者資料
+        $FacebookUser = Socialite::driver('facebook')
+            ->fields([
+                'name',
+                'email',
+                'gender',
+                'verified',
+                'link',
+                'first_name',
+                'last_name',
+                'locale',
+            ])
+            ->redirectUrl($redirect_url)->user();
+
+        $facebook_email = $FacebookUser->email;
+
+        if (is_null($facebook_email)) {
+            throw new Exception('未授權取得使用者 Email');
+        }
+//        取得 Facebook 資料
+        $facebook_id = $FacebookUser->id;
+        $facebook_name = $FacebookUser->name;
+
+//        取得使用者資料是否有此 Facebook id 資料
+        $User = User::where('facebook_id', $facebook_id)->first();
+
+        if (is_null($User)) {
+//            沒有綁定 Facebook Id 的帳號滿透過 Email 尋找是否有此帳號
+            $User = User::where('email', $facebook_email)->fisrt();
+            if (!is_null($User)) {
+//                有此帳號，綁定 Facebook Id
+                $User->facebook_id = $facebook_id;
+                $User->save();
+            }
+        }
+
+        if (is_null($User)) {
+//            尚未註冊
+            $input = [
+                'email' => $facebook_email,
+                'nickname' => $facebook_name,
+                'password' => uniqid(),  // 隨機產生密碼
+                'facebook_id' => $facebook_id,
+                'type' => 'G',
+            ];
+//            密碼加密
+            $input['password'] = Hash::make($input['password']);
+//            新增會員資料
+            $User = User::create($input);
+
+//            寄送註冊信
+            $mail_binding = [
+                'nickname' => $input['nickname']
+            ];
+
+            Mail::send('email.signUpEmailNotification', $mail_binding, function ($mail) use ($input){
+               $mail->to($input['email']);
+               $mail->from('eml0777us@gmail.com');
+               $mail->subject('恭喜註冊 Shop Laravel 成功');
+            });
+
+//            登入會員
+//            session 記錄會員編號
+            session()->put('user_id', $User->id);
+
+//            重新導向到原先使用者造訪頁面，如果沒有造訪頁則重新導向回首頁
+            return redirect()->intended('/');
+        }
     }
 }
