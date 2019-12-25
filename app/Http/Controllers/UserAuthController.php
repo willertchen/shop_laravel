@@ -72,6 +72,7 @@ class UserAuthController extends Controller
 //        寄送註冊通知信
         $mail_binding = [
             'nickname' => $input['nickname'],
+            'email' => $input['email'],
         ];
 
 //        派發 "註冊成功信" 工作
@@ -235,7 +236,8 @@ class UserAuthController extends Controller
 
 //            寄送註冊信
             $mail_binding = [
-                'nickname' => $input['nickname']
+                'nickname' => $input['nickname'],
+                'email' => $input['email'],
             ];
 
 //            派發 "註冊成功信" 工作
