@@ -12,6 +12,12 @@ use Image;
 
 class MerchandiseController extends Controller
 {
+//    首頁
+    public function indexPage(){
+//        重新導向至商品頁
+        return redirect('/merchandise');
+    }
+
 //    新增商品
     public function merchandiseCreateProcess()
     {

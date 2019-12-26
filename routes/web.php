@@ -11,9 +11,8 @@
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+// 首頁
+Route::get('/', 'MerchandiseController@indexPage');
 
 // 使用者
 Route::group(['prefix' => 'user'], function () {
