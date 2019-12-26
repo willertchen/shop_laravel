@@ -76,7 +76,7 @@ class UserAuthController extends Controller
         ];
 
 //        派發 "註冊成功信" 工作
-        SendSignUpMailJob::dispatch($mail_binding);
+        SendSignUpMailJob::dispatch($mail_binding)->onQueue('high');
 
 //        重新導向到登入頁面
         return redirect('/user/auth/sign-in');
@@ -241,7 +241,7 @@ class UserAuthController extends Controller
             ];
 
 //            派發 "註冊成功信" 工作
-            SendSignUpMailJob::dispatch($mail_binding);
+            SendSignUpMailJob::dispatch($mail_binding)->onQueue('high');
 
         }
 //        登入會員

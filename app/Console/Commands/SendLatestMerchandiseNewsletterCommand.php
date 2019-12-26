@@ -74,7 +74,7 @@ class SendLatestMerchandiseNewsletterCommand extends Command
 //            派送會員電子信工作
             $this->comment('派送會員電子信（Start）');
             foreach ($UserCollection as $User) {
-                SendMerchandiseNewslettetJob::dispatch($User, $MerchandiseCollection);
+                SendMerchandiseNewslettetJob::dispatch($User, $MerchandiseCollection)->onQueue('low');
             }
             $this->comment('派送會員電子信（End）');
 
